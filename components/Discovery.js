@@ -14,6 +14,7 @@ type DiscoveryProps = {
 
 type DiscoveryState = {
   selectedStory: Story | null;
+  position: Position | null
 };
 
 type RefObject<T> = {
@@ -23,13 +24,17 @@ type RefObject<T> = {
 export default class Discovery extends React.PureComponent<DiscoveryProps, DiscoveryState> {
   selectStory = async (selectedStory: Story | null, index?: number) => {
     console.log("Selected story:", selectedStory, "index:", index);
-    this.setState({selectedStory});
+    if (selectedStory === null) {
+      this.setState({selectedStory});
+      return;
+    }
 
     if (index !== undefined) {
       const thumbnail = this.thumbnails[index].current;
       if (thumbnail !== null) {
-        const pos = await thumbnail.measure();
-        console.log("Position:", pos);
+        const position = await thumbnail.measure();
+        console.log("Position:", position);
+        this.setState({selectedStory, position});
       }
     }
   }
@@ -38,18 +43,18 @@ export default class Discovery extends React.PureComponent<DiscoveryProps, Disco
 
   constructor(props: DiscoveryProps) {
     super(props);
-    this.state = { selectedStory: null };
+    this.state = { selectedStory: null, position: null };
     this.thumbnails = props.stories.map(() => React.createRef());
   }
 
   render() {
     const { stories } = this.props;
-    const { selectedStory } = this.state;
+    const { selectedStory, position } = this.state;
 
     return (
       <View style={styles.container}>
         <ScrollView>
-          <SafeAreaView
+          <View
             style={styles.content}
             contentInsetAdjustmentBehavior="automatic"
           >
@@ -60,11 +65,11 @@ export default class Discovery extends React.PureComponent<DiscoveryProps, Disco
                   ref={this.thumbnails[index]}
                   onPress={() => this.selectStory(story, index)}
                 />)}
-          </SafeAreaView>
+          </View>
         </ScrollView>
 
         { selectedStory && (
-          <StoryModal story={selectedStory} onClose={() => this.selectStory(null)} />
+          <StoryModal story={selectedStory} position={position} onClose={() => this.selectStory(null)} />
         )}
       </View>
     );

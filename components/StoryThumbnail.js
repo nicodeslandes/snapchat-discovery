@@ -5,6 +5,7 @@ import {
 } from "react-native";
 
 import type { Story } from "./StoryModel";
+import type { Position } from "./Position";
 
 const width = Dimensions.get("window").width / 2 - 16 * 2;
 const height = width * 1.77;
@@ -28,11 +29,11 @@ export default class StoryThumbnail extends React.PureComponent<StoryThumbnailPr
     );
   }
 
-  measure(): Promise<{x: number, y: number, width: number, height: number}> {
+  measure(): Promise<Position> {
     console.log('Calling measure');
     return new Promise((res, err) => {
       if (this.imageRef.current) {
-        this.imageRef.current.measureInWindow((x, y, width, height) => {
+        this.imageRef.current.measure((originX, originY, width, height, x, y) => {
           res({x,y,width,height})
         });
       }
