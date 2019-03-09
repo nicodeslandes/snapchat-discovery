@@ -15,7 +15,7 @@ export default class Discovery extends React.PureComponent<DiscoveryProps> {
   render() {
     const { stories } = this.props;
     return (
-      <View style={stories.container}>
+      <View style={styles.container}>
         <ScrollView>
           <SafeAreaView
             style={styles.content}

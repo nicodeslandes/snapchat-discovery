@@ -4,7 +4,7 @@ import {
   View, StyleSheet, Image, Dimensions,
 } from "react-native";
 
-import type Story from "./StoryModel";
+import type { Story } from "./StoryModel";
 
 const width = Dimensions.get("window").width / 2 - 16 * 2;
 const height = width * 1.77;
