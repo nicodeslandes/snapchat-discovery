@@ -6,14 +6,31 @@ import {
 
 import StoryThumbnail from "./StoryThumbnail";
 import type { Story } from "./StoryModel";
+import StoryModal from "./StoryModal";
 
 type DiscoveryProps = {
   stories: Story[];
 };
 
-export default class Discovery extends React.PureComponent<DiscoveryProps> {
+type DiscoveryState = {
+  selectedStory: Story | null;
+};
+
+export default class Discovery extends React.PureComponent<DiscoveryProps, DiscoveryState> {
+  selectStory = (selectedStory: Story | null) => {
+    console.log("Selected story:", selectedStory);
+    this.setState({selectedStory});
+  }
+
+  constructor(props: DiscoveryProps) {
+    super(props);
+    this.state = { selectedStory: null };
+  }
+
   render() {
     const { stories } = this.props;
+    const { selectedStory } = this.state;
+
     return (
       <View style={styles.container}>
         <ScrollView>
@@ -21,9 +38,18 @@ export default class Discovery extends React.PureComponent<DiscoveryProps> {
             style={styles.content}
             contentInsetAdjustmentBehavior="automatic"
           >
-            {stories.map(story => <StoryThumbnail key={story.id} {...{ story }} />)}
+            {stories.map(story =>
+                <StoryThumbnail
+                  key={story.id}
+                  {...{ story }}
+                  onPress={() => this.selectStory(story)}
+                />)}
           </SafeAreaView>
         </ScrollView>
+
+        { selectedStory && (
+          <StoryModal story={selectedStory} onClose={() => this.selectStory(null)} />
+        )}
       </View>
     );
   }

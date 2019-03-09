@@ -1,7 +1,7 @@
 // @flow
 import * as React from "react";
 import {
-  View, StyleSheet, Image, Dimensions,
+  View, StyleSheet, Image, Dimensions, Text, TouchableWithoutFeedback, measureInWindow
 } from "react-native";
 
 import type { Story } from "./StoryModel";
@@ -11,14 +11,17 @@ const height = width * 1.77;
 
 type StoryThumbnailProps = {
   story: Story,
+  onPress: () => mixed;
 };
 
 export default class StoryThumbnail extends React.PureComponent<StoryThumbnailProps> {
   render() {
-    const { story } = this.props;
+    const { story, onPress } = this.props;
     return (
       <View style={styles.container}>
-        <Image source={story.source} style={styles.image} />
+        <TouchableWithoutFeedback {...{ onPress }}>
+          <Image source={story.source} style={styles.image} />
+        </TouchableWithoutFeedback>
       </View>
     );
   }
@@ -34,5 +37,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     width: null,
     height: null,
+    borderRadius: 10,    
   },
 });
