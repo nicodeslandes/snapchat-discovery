@@ -16,15 +16,30 @@ type DiscoveryState = {
   selectedStory: Story | null;
 };
 
+type RefObject<T> = {
+  current: T | null
+};
+
 export default class Discovery extends React.PureComponent<DiscoveryProps, DiscoveryState> {
-  selectStory = (selectedStory: Story | null) => {
-    console.log("Selected story:", selectedStory);
+  selectStory = async (selectedStory: Story | null, index?: number) => {
+    console.log("Selected story:", selectedStory, "index:", index);
     this.setState({selectedStory});
+
+    if (index !== undefined) {
+      const thumbnail = this.thumbnails[index].current;
+      if (thumbnail !== null) {
+        const pos = await thumbnail.measure();
+        console.log("Position:", pos);
+      }
+    }
   }
+
+  thumbnails: RefObject<StoryThumbnail>[]
 
   constructor(props: DiscoveryProps) {
     super(props);
     this.state = { selectedStory: null };
+    this.thumbnails = props.stories.map(() => React.createRef());
   }
 
   render() {
@@ -38,11 +53,12 @@ export default class Discovery extends React.PureComponent<DiscoveryProps, Disco
             style={styles.content}
             contentInsetAdjustmentBehavior="automatic"
           >
-            {stories.map(story =>
+            {stories.map((story, index) =>
                 <StoryThumbnail
                   key={story.id}
                   {...{ story }}
-                  onPress={() => this.selectStory(story)}
+                  ref={this.thumbnails[index]}
+                  onPress={() => this.selectStory(story, index)}
                 />)}
           </SafeAreaView>
         </ScrollView>

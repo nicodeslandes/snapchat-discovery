@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { TouchableHighlight, Image, Text, SafeAreaView, View, StyleSheet } from 'react-native'
 import type { Story } from './StoryModel';
 
@@ -7,7 +7,7 @@ type StoryModalProps = {
   onClose: () => mixed
 }
 
-export default class StoryModal extends Component<StoryModalProps> {
+export default class StoryModal extends PureComponent<StoryModalProps> {
   render() {
     const { story, onClose } = this.props;
 
