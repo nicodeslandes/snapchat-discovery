@@ -63,8 +63,8 @@ const styles = StyleSheet.create({
     height: null,
   },
   closeButton: {
-    marginTop: 30,
-    margin: 20,
+    // marginTop: 10,
+    margin: 10,
     alignSelf: 'flex-end',
     alignItems: 'center',
     backgroundColor: '#555',
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderColor: 'red',
     marginLeft: 1,
-    marginTop: -2,
-    fontSize: 20
+    marginTop: 0,
+    fontSize: 18
   },
 })
