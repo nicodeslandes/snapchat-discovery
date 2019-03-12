@@ -15,7 +15,7 @@ type StoryModalProps = {
 
 const {width: wWidth, height: wHeight} = Dimensions.get('window');
 
-function runSpring(clock, start, end) {  
+function runSpring(clock, value, end) {  
   const state = {
     finished: new Value(0),
     velocity: new Value(0),
@@ -24,9 +24,9 @@ function runSpring(clock, start, end) {
   };
 
   const config = {
-    damping: 18,
+    damping: 15,
     mass: 1,
-    stiffness: 10,
+    stiffness: 120,
     overshootClamping: false,
     restSpeedThreshold: .01,
     restDisplacementThreshold: .01,
@@ -35,7 +35,7 @@ function runSpring(clock, start, end) {
 
   return block([
     cond(clockRunning(clock), 0, [
-      set(state.position, start),
+      set(state.position, value),
       set(state.velocity, 0),
       set(config.toValue, end),
       startClock(clock)
@@ -44,6 +44,29 @@ function runSpring(clock, start, end) {
     cond(state.finished, stopClock(clock)),
     state.position,
   ]);
+}
+
+function setDraggableSpring(value, gestureState, dragValue, endValue) {
+  const clock = new Clock();
+  const prevDragValue = new Value(0);
+
+  return cond(eq(gestureState, State.ACTIVE), [
+      stopClock(clock),
+      set(value, add(value, sub(dragValue, prevDragValue))),
+      set(prevDragValue, dragValue),
+      value
+    ],
+    [
+      set(prevDragValue, 0),
+      set(value, runSpring(clock, value, 0))
+    ]);
+}
+
+function animatedSpring(start, end) {
+  const value = new Value(start);
+  const clock = new Clock();
+
+  return set(value, runSpring(clock, value, end));
 }
 
 export default class StoryModal extends PureComponent<StoryModalProps> {
@@ -58,43 +81,13 @@ export default class StoryModal extends PureComponent<StoryModalProps> {
     const translateY = new Value(0);
 
     const x = new Value(initX);
-    const yStart = new Value(initY);
-    const clockY = new Clock();
-    const clockWidth = new Clock();
-    const clockHeight = new Clock();
+    const y = new Value(initY);
 
-    function setDraggableSpring(value, dragValue, endValue) {
-      const clock = new Clock();
-      const prevDragValue = new Value(0);
+    this.x = setDraggableSpring(x, gestureState, translateX, 0);
+    this.y = setDraggableSpring(y, gestureState, translateY, 0);
 
-      cond(eq(gestureState, State.ACTIVE), [
-        stopClock(clock),
-        set(value, add(value, sub(dragValue, prevDragValue))),
-        set(prevDragValue, dragValue),
-        value
-      ],
-      [
-        debug('x value', value),
-        set(prevDragValue, 0),
-        set(value, runSpring(clock, value, endValue))
-      ]);
-    }
-
-    //this.x = setDraggableSpring(x, translateX, 0);
-
-    const clockX = new Clock();
-    const xStart = new Value(initX);
-    this.x = cond(eq(gestureState, State.ACTIVE), [
-                stopClock(clockX),
-                set(xStart, translateX)
-              ],
-              set(xStart, runSpring(clockX, xStart, 0)));
-    this.y = cond(eq(gestureState, State.ACTIVE),
-               set(yStart, translateY),
-               runSpring(clockY, initY, 0));
-            
-    this.width = runSpring(clockWidth, initWidth, wWidth);
-    this.height = runSpring(clockHeight, initHeight, wHeight);
+    this.width = animatedSpring(initWidth, wWidth);
+    this.height = animatedSpring(initHeight, wHeight);
 
 
     this.onGestureEvent = Animated.event([{
