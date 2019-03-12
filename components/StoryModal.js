@@ -36,6 +36,7 @@ function runSpring(clock, value, end) {
   return block([
     cond(clockRunning(clock), 0, [
       set(state.position, value),
+      set(state.finished, 0),
       set(state.velocity, 0),
       set(config.toValue, end),
       startClock(clock)
